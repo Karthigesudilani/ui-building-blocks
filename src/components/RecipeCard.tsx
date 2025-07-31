@@ -1,8 +1,13 @@
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
-import { Clock, Users, ChefHat, Heart, Plus, Eye } from "lucide-react";
+import { Clock, Users, ChefHat, Heart, Plus, Eye, Download, Activity, Utensils } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { CookingModeModal } from "./CookingModeModal";
+import { NutritionModal } from "./NutritionModal";
+import { SubstitutionsModal } from "./SubstitutionsModal";
+import { CompletionModal } from "./CompletionModal";
 
 interface Recipe {
   id: string;
@@ -23,6 +28,8 @@ interface RecipeCardProps {
   onToggleExpand?: () => void;
   onAddToCollection?: () => void;
   onAddToFavorites?: () => void;
+  onStartCooking?: () => void;
+  showActionButtons?: boolean;
 }
 
 export const RecipeCard = ({ 
@@ -30,8 +37,67 @@ export const RecipeCard = ({
   isExpanded = false, 
   onToggleExpand,
   onAddToCollection,
-  onAddToFavorites 
+  onAddToFavorites,
+  onStartCooking,
+  showActionButtons = true
 }: RecipeCardProps) => {
+  const [showCookingMode, setShowCookingMode] = useState(false);
+  const [showNutrition, setShowNutrition] = useState(false);
+  const [showSubstitutions, setShowSubstitutions] = useState(false);
+  const [showCompletion, setShowCompletion] = useState(false);
+  const [currentStep, setCurrentStep] = useState(0);
+
+  // Sample cooking steps
+  const cookingSteps = recipe.instructions.map((instruction, index) => ({
+    step: index + 1,
+    instruction,
+    duration: index === 0 ? 2 : undefined,
+    tips: index === 0 ? ["Make sure eggs are at room temperature for best results"] : undefined
+  }));
+
+  // Sample nutrition data
+  const nutritionData = {
+    macronutrients: {
+      calories: 250,
+      protein: 28,
+      carbohydrates: 4,
+      fat: 12
+    },
+    micronutrients: {
+      fiber: 0,
+      sugar: 1,
+      sodium: 350
+    },
+    vitamins: ["Vitamin B12", "Vitamin D", "Vitamin A", "Riboflavin"],
+    minerals: ["Calcium", "Selenium", "Phosphorus", "Potassium"]
+  };
+
+  // Sample substitution data
+  const substitutions = [
+    {
+      ingredient: "soy sauce",
+      substitutes: [
+        {
+          name: "Coconut aminos",
+          ratio: "1:1",
+          notes: "Slightly sweeter and less salty than soy sauce, with a subtle coconut flavor. Good for those with soy allergies.",
+          commonality: "common" as const
+        },
+        {
+          name: "Tamari", 
+          ratio: "1:1",
+          notes: "Similar to soy sauce but gluten-free. Slightly richer and less salty.",
+          commonality: "common" as const
+        }
+      ]
+    }
+  ];
+
+  const handleFinishCooking = () => {
+    setShowCookingMode(false);
+    setShowCompletion(true);
+  };
+  
   const efficiencyColor = recipe.efficiency >= 90 ? "recipe-efficiency" : "recipe-easy";
   
   return (
@@ -119,30 +185,108 @@ export const RecipeCard = ({
           </div>
         )}
 
-        <div className="flex gap-2 mt-4">
-          {onToggleExpand && (
-            <Button 
-              variant={isExpanded ? "outline" : "default"} 
-              className="flex-1"
-              onClick={onToggleExpand}
-            >
-              {isExpanded ? "View Less" : "View Full Recipe"}
-            </Button>
-          )}
-          
-          <div className="flex gap-2">
-            {onAddToCollection && (
-              <Button variant="success" size="sm" onClick={onAddToCollection}>
-                <Plus className="w-4 h-4" />
+        {showActionButtons && (
+          <div className="space-y-3 mt-4">
+            <div className="flex gap-2">
+              {onToggleExpand && (
+                <Button 
+                  variant={isExpanded ? "outline" : "default"} 
+                  className="flex-1"
+                  onClick={onToggleExpand}
+                >
+                  {isExpanded ? "View Less" : "View Full Recipe"}
+                </Button>
+              )}
+              
+              <Button 
+                variant="success" 
+                onClick={() => setShowCookingMode(true)}
+                className="flex-1"
+              >
+                <Utensils className="w-4 h-4 mr-2" />
+                Start Cooking
               </Button>
-            )}
-            {onAddToFavorites && (
-              <Button variant="outline" size="sm" onClick={onAddToFavorites}>
-                <Heart className="w-4 h-4" />
+            </div>
+
+            <div className="grid grid-cols-2 gap-2">
+              <Button 
+                variant="success" 
+                size="sm"
+                onClick={() => setShowNutrition(true)}
+              >
+                <Download className="w-4 h-4 mr-2" />
+                Download PDF
               </Button>
-            )}
+              
+              {onAddToCollection && (
+                <Button 
+                  variant="outline" 
+                  size="sm" 
+                  onClick={onAddToCollection}
+                >
+                  <Plus className="w-4 h-4 mr-2" />
+                  Add to Collection
+                </Button>
+              )}
+              
+              <Button 
+                variant="outline" 
+                size="sm"
+                onClick={() => setShowSubstitutions(true)}
+              >
+                Substitutions
+              </Button>
+              
+              <Button 
+                variant="outline" 
+                size="sm"
+                onClick={() => setShowNutrition(true)}
+              >
+                <Activity className="w-4 h-4 mr-2" />
+                Nutrition
+              </Button>
+            </div>
           </div>
-        </div>
+        )}
+
+        {/* Modals */}
+        <CookingModeModal
+          open={showCookingMode}
+          onOpenChange={setShowCookingMode}
+          recipeTitle={recipe.title}
+          recipeImage={recipe.image}
+          cookTime={recipe.cookTime}
+          servings={recipe.servings}
+          difficulty={recipe.difficulty}
+          steps={cookingSteps}
+          currentStep={currentStep}
+          onNextStep={() => setCurrentStep(prev => Math.min(prev + 1, cookingSteps.length - 1))}
+          onPreviousStep={() => setCurrentStep(prev => Math.max(prev - 1, 0))}
+          onFinish={handleFinishCooking}
+        />
+
+        <NutritionModal
+          open={showNutrition}
+          onOpenChange={setShowNutrition}
+          recipeTitle={recipe.title}
+          nutritionData={nutritionData}
+          servings={recipe.servings}
+        />
+
+        <SubstitutionsModal
+          open={showSubstitutions}
+          onOpenChange={setShowSubstitutions}
+          substitutions={substitutions}
+        />
+
+        <CompletionModal
+          open={showCompletion}
+          onOpenChange={setShowCompletion}
+          recipeTitle={recipe.title}
+          recipeImage={recipe.image}
+          cookTime={recipe.cookTime}
+          servings={recipe.servings}
+        />
       </CardContent>
     </Card>
   );
