@@ -1,12 +1,10 @@
 import { useState } from "react";
 import { Header } from "@/components/Header";
-import { RecipeCard } from "@/components/RecipeCard";
 import { Button } from "@/components/ui/button";
 import { Plus } from "lucide-react";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
 import { CollectionCard } from "@/components/CollectionCard";
+import { CreateCollectionModal } from "@/components/CreateCollectionModal";
+import { CollectionDetailPage } from "@/components/CollectionDetailPage";
 import foodFriedRice from "@/assets/food-friedrice.jpg";
 
 interface Collection {
@@ -15,6 +13,7 @@ interface Collection {
   description?: string;
   recipeCount: number;
   createdAt: string;
+  color: string;
   recipes: Array<{
     id: string;
     title: string;
@@ -30,6 +29,7 @@ interface Collection {
 
 export const CollectionsPage = () => {
   const [showCreateDialog, setShowCreateDialog] = useState(false);
+  const [selectedCollection, setSelectedCollection] = useState<Collection | null>(null);
   const [collections, setCollections] = useState<Collection[]>([
     {
       id: "1",
@@ -37,6 +37,7 @@ export const CollectionsPage = () => {
       description: "test",
       recipeCount: 1,
       createdAt: "7/31/2025",
+      color: "bg-orange-500",
       recipes: [
         {
           id: "1",
@@ -62,27 +63,50 @@ export const CollectionsPage = () => {
     }
   ]);
 
-  const [newCollection, setNewCollection] = useState({
-    name: "",
-    description: ""
-  });
-
-  const handleCreateCollection = () => {
-    if (newCollection.name.trim()) {
-      const collection: Collection = {
-        id: Date.now().toString(),
-        name: newCollection.name,
-        description: newCollection.description,
-        recipeCount: 0,
-        createdAt: new Date().toLocaleDateString(),
-        recipes: []
-      };
-      
-      setCollections([...collections, collection]);
-      setNewCollection({ name: "", description: "" });
-      setShowCreateDialog(false);
-    }
+  const handleCreateCollection = (newCollection: { name: string; description: string; color: string }) => {
+    const collection: Collection = {
+      id: Date.now().toString(),
+      name: newCollection.name,
+      description: newCollection.description,
+      color: newCollection.color,
+      recipeCount: 0,
+      createdAt: new Date().toLocaleDateString(),
+      recipes: []
+    };
+    
+    setCollections([...collections, collection]);
+    setShowCreateDialog(false);
   };
+
+  const handleViewCollection = (collection: Collection) => {
+    setSelectedCollection(collection);
+  };
+
+  const handleEditCollection = (collectionId: string) => {
+    // TODO: Implement edit functionality
+    console.log("Edit collection:", collectionId);
+  };
+
+  const handleDeleteCollection = (collectionId: string) => {
+    setCollections(collections.filter(c => c.id !== collectionId));
+  };
+
+  if (selectedCollection) {
+    return (
+      <CollectionDetailPage
+        collection={selectedCollection}
+        onBack={() => setSelectedCollection(null)}
+        onEdit={() => handleEditCollection(selectedCollection.id)}
+        onDelete={() => {
+          handleDeleteCollection(selectedCollection.id);
+          setSelectedCollection(null);
+        }}
+        onAddRecipe={() => {
+          console.log("Add recipe to collection:", selectedCollection.id);
+        }}
+      />
+    );
+  }
 
   return (
     <div className="min-h-screen bg-background">
@@ -115,18 +139,9 @@ export const CollectionsPage = () => {
             <CollectionCard
               key={collection.id}
               collection={collection}
-              onView={() => {
-                // Navigate to collection detail view
-                console.log("View collection:", collection.id);
-              }}
-              onEdit={() => {
-                // Open edit dialog
-                console.log("Edit collection:", collection.id);
-              }}
-              onDelete={() => {
-                // Delete collection
-                setCollections(collections.filter(c => c.id !== collection.id));
-              }}
+              onView={() => handleViewCollection(collection)}
+              onEdit={() => handleEditCollection(collection.id)}
+              onDelete={() => handleDeleteCollection(collection.id)}
             />
           ))}
         </div>
@@ -148,51 +163,11 @@ export const CollectionsPage = () => {
         )}
       </div>
 
-      <Dialog open={showCreateDialog} onOpenChange={setShowCreateDialog}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>Create New Collection</DialogTitle>
-          </DialogHeader>
-          
-          <div className="space-y-4">
-            <div>
-              <label className="text-sm font-medium mb-2 block">Collection Name</label>
-              <Input
-                value={newCollection.name}
-                onChange={(e) => setNewCollection({ ...newCollection, name: e.target.value })}
-                placeholder="e.g., Quick Dinners, Healthy Snacks..."
-              />
-            </div>
-            
-            <div>
-              <label className="text-sm font-medium mb-2 block">Description (Optional)</label>
-              <Textarea
-                value={newCollection.description}
-                onChange={(e) => setNewCollection({ ...newCollection, description: e.target.value })}
-                placeholder="Describe what this collection is about..."
-                rows={3}
-              />
-            </div>
-            
-            <div className="flex gap-2 pt-4">
-              <Button 
-                variant="outline" 
-                onClick={() => setShowCreateDialog(false)}
-                className="flex-1"
-              >
-                Cancel
-              </Button>
-              <Button 
-                onClick={handleCreateCollection}
-                disabled={!newCollection.name.trim()}
-                className="flex-1"
-              >
-                Create Collection
-              </Button>
-            </div>
-          </div>
-        </DialogContent>
-      </Dialog>
+      <CreateCollectionModal
+        open={showCreateDialog}
+        onOpenChange={setShowCreateDialog}
+        onCreateCollection={handleCreateCollection}
+      />
     </div>
   );
 };

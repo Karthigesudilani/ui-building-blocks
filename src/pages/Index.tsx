@@ -3,7 +3,7 @@ import { Header } from "@/components/Header";
 import { HeroSection } from "@/components/HeroSection";
 import { ProblemSolutionSection, HowItWorksSection } from "@/components/ProblemSolutionSection";
 import { Footer } from "@/components/Footer";
-import { IngredientInput } from "@/components/IngredientInput";
+import { EnhancedIngredientInput } from "@/components/EnhancedIngredientInput";
 import { RecipeCard } from "@/components/RecipeCard";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
@@ -125,7 +125,7 @@ const Index = () => {
       <Footer />
 
       <Dialog open={showIngredientDialog} onOpenChange={setShowIngredientDialog}>
-        <DialogContent className="sm:max-w-md">
+        <DialogContent className="sm:max-w-2xl max-h-[90vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle className="text-center">What's in Your Kitchen?</DialogTitle>
           </DialogHeader>
@@ -135,24 +135,13 @@ const Index = () => {
               personalized recipes that minimize waste and maximize flavor.
             </p>
             
-            <IngredientInput
+            <EnhancedIngredientInput
               ingredients={ingredients}
               onIngredientsChange={setIngredients}
               onSearch={handleSearch}
-              placeholder="Type an ingredient..."
+              placeholder="Search for ingredients..."
             />
             
-            {ingredients.length === 0 && (
-              <div className="mt-6 p-4 bg-muted/30 rounded-lg">
-                <p className="text-sm text-muted-foreground mb-2">💡 Tips for Better Results:</p>
-                <ul className="text-xs text-muted-foreground space-y-1">
-                  <li>• Include main ingredients like proteins, vegetables, and grains</li>
-                  <li>• Add common pantry staples (oil, spices, etc.)</li>
-                  <li>• Be specific about ingredients (e.g., "chicken breast" vs "chicken")</li>
-                  <li>• The more ingredients you add, the better the recipe suggestions</li>
-                </ul>
-              </div>
-            )}
           </div>
         </DialogContent>
       </Dialog>
