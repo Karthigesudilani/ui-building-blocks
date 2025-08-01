@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
-import { Clock, Users, ChefHat, Heart, Plus, Eye, Download, Activity, Utensils } from "lucide-react";
+import { Clock, Users, ChefHat, Heart, HeartOff, Plus, Eye, Download, Activity, Utensils } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { CookingModeModal } from "./CookingModeModal";
 import { NutritionModal } from "./NutritionModal";
@@ -30,6 +30,8 @@ interface RecipeCardProps {
   onAddToFavorites?: () => void;
   onStartCooking?: () => void;
   showActionButtons?: boolean;
+  isFavorited?: boolean;
+  showCollectionButton?: boolean;
 }
 
 export const RecipeCard = ({ 
@@ -39,7 +41,9 @@ export const RecipeCard = ({
   onAddToCollection,
   onAddToFavorites,
   onStartCooking,
-  showActionButtons = true
+  showActionButtons = true,
+  isFavorited = false,
+  showCollectionButton = true
 }: RecipeCardProps) => {
   const [showCookingMode, setShowCookingMode] = useState(false);
   const [showNutrition, setShowNutrition] = useState(false);
@@ -218,7 +222,7 @@ export const RecipeCard = ({
                 Download PDF
               </Button>
               
-              {onAddToCollection && (
+              {showCollectionButton && onAddToCollection && (
                 <Button 
                   variant="outline" 
                   size="sm" 
@@ -226,6 +230,26 @@ export const RecipeCard = ({
                 >
                   <Plus className="w-4 h-4 mr-2" />
                   Add to Collection
+                </Button>
+              )}
+
+              {onAddToFavorites && (
+                <Button 
+                  variant="outline" 
+                  size="sm" 
+                  onClick={onAddToFavorites}
+                >
+                  {isFavorited ? (
+                    <>
+                      <HeartOff className="w-4 h-4 mr-2" />
+                      Remove from Favorites
+                    </>
+                  ) : (
+                    <>
+                      <Heart className="w-4 h-4 mr-2" />
+                      Add to Favorites
+                    </>
+                  )}
                 </Button>
               )}
               

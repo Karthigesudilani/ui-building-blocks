@@ -1,11 +1,13 @@
 import Header from "@/components/Header";
+import { useState } from "react";
 import { RecipeCard } from "@/components/RecipeCard";
-import { Heart } from "lucide-react";
+import { Heart, HeartOff } from "lucide-react";
+import { useToast } from "@/hooks/use-toast";
 import foodFriedRice from "@/assets/food-friedrice.jpg";
 
 export const FavoritesPage = () => {
-  // Sample favorite recipes data
-  const favoriteRecipes = [
+  const { toast } = useToast();
+  const [favoriteRecipes, setFavoriteRecipes] = useState([
     {
       id: "1",
       title: "Chicken and Egg Fried Rice",
@@ -66,7 +68,27 @@ export const FavoritesPage = () => {
         "In a large bowl, toss chicken with olive oil, lemon juice, lemon zest, oregano, thyme, salt, and pepper. Add onion if using."
       ]
     }
-  ];
+  ]);
+
+  const [expandedRecipes, setExpandedRecipes] = useState<Set<string>>(new Set());
+
+  const toggleRecipeExpanded = (recipeId: string) => {
+    const newExpanded = new Set(expandedRecipes);
+    if (newExpanded.has(recipeId)) {
+      newExpanded.delete(recipeId);
+    } else {
+      newExpanded.add(recipeId);
+    }
+    setExpandedRecipes(newExpanded);
+  };
+
+  const handleRemoveFromFavorites = (recipeId: string) => {
+    setFavoriteRecipes(prevRecipes => prevRecipes.filter(recipe => recipe.id !== recipeId));
+    toast({
+      title: "Removed from favorites",
+      description: "Recipe has been removed from your favorites.",
+    });
+  };
 
   return (
     <div className="min-h-screen bg-background">
@@ -84,18 +106,17 @@ export const FavoritesPage = () => {
         </div>
 
         {favoriteRecipes.length > 0 ? (
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="grid gap-6">
             {favoriteRecipes.map((recipe) => (
               <RecipeCard
                 key={recipe.id}
                 recipe={recipe}
-                onAddToFavorites={() => {
-                  // Remove from favorites
-                  console.log("Remove from favorites:", recipe.id);
-                }}
-                onAddToCollection={() => {
-                  console.log("Add to collection:", recipe.id);
-                }}
+                isExpanded={expandedRecipes.has(recipe.id)}
+                onToggleExpand={() => toggleRecipeExpanded(recipe.id)}
+                onAddToFavorites={() => handleRemoveFromFavorites(recipe.id)}
+                showActionButtons={true}
+                isFavorited={true}
+                showCollectionButton={false}
               />
             ))}
           </div>
