@@ -20,8 +20,8 @@ export const FeatureCard = ({ icon: Icon, title, description, step }: FeatureCar
         <div className="w-12 h-12 bg-primary/10 rounded-lg flex items-center justify-center mx-auto mb-4">
           <Icon className="w-6 h-6 text-primary" />
         </div>
-        <h3 className="text-lg font-semibold mb-2">{title}</h3>
-        <p className="text-muted-foreground text-sm leading-relaxed">{description}</p>
+        <h3 className="text-lg font-heading font-semibold mb-2">{title}</h3>
+        <p className="text-muted-foreground text-sm font-body leading-relaxed">{description}</p>
       </CardContent>
     </Card>
   );

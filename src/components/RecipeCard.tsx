@@ -132,9 +132,9 @@ export const RecipeCard = ({
       </CardHeader>
 
       <CardContent className="p-4">
-        <h3 className="text-lg font-semibold mb-2">{recipe.title}</h3>
+        <h3 className="text-lg font-heading font-semibold mb-2">{recipe.title}</h3>
         
-        <div className="flex items-center gap-4 text-sm text-muted-foreground mb-4">
+        <div className="flex items-center gap-4 text-sm font-body text-muted-foreground mb-4">
           <div className="flex items-center gap-1">
             <Clock className="w-4 h-4" />
             {recipe.cookTime} minutes
@@ -152,11 +152,11 @@ export const RecipeCard = ({
         {isExpanded && (
           <div className="space-y-4">
             <div>
-              <h4 className="font-medium mb-2 flex items-center gap-2">
+              <h4 className="font-heading font-medium mb-2 flex items-center gap-2">
                 <ChefHat className="w-4 h-4 text-primary" />
                 All Ingredients
               </h4>
-              <div className="grid grid-cols-1 gap-2 text-sm">
+              <div className="grid grid-cols-1 gap-2 text-sm font-body">
                 {recipe.ingredients.map((ingredient, index) => (
                   <div key={index} className="flex items-center gap-2">
                     <div className="w-2 h-2 bg-muted-foreground rounded-full" />
@@ -167,13 +167,13 @@ export const RecipeCard = ({
             </div>
 
             <div>
-              <h4 className="font-medium mb-2 flex items-center gap-2">
+              <h4 className="font-heading font-medium mb-2 flex items-center gap-2">
                 <Eye className="w-4 h-4 text-primary" />
                 Complete Instructions
               </h4>
               <div className="space-y-2">
                 {recipe.instructions.map((instruction, index) => (
-                  <div key={index} className="flex gap-3 text-sm">
+                  <div key={index} className="flex gap-3 text-sm font-body">
                     <div className="w-6 h-6 bg-primary text-primary-foreground rounded-full flex items-center justify-center text-xs font-medium flex-shrink-0 mt-0.5">
                       {index + 1}
                     </div>

@@ -1,4 +1,4 @@
-import { Header } from "@/components/Header";
+import Header from "@/components/Header";
 import { RecipeCard } from "@/components/RecipeCard";
 import { Heart } from "lucide-react";
 import foodFriedRice from "@/assets/food-friedrice.jpg";
